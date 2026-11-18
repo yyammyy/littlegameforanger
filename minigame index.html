@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mood Relief Arcade - Earth Tone</title>
+    <style>
+        :root {
+            --bg-cream: #F5F0E6;
+            --card-bg: #FAF7F2;
+            --sage: #8A9A86;
+            --sage-dark: #6E7E6A;
+            --sage-light: #D8E2DC;
+            --terracotta: #C87D55;
+            --terracotta-dark: #A8633E;
+            --espresso: #3A322C;
+            --muted-text: #6B5B52;
+            --sand: #E6CCB2;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-cream);
+            color: var(--espresso);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+        }
+
+        /* Halaman / Views */
+        .screen {
+            display: none;
+            width: 100%;
+            max-width: 500px;
+            min-height: 100vh;
+            padding: 24px 20px;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* Header & Navigasi */
+        .top-bar {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .btn-back {
+            background-color: var(--sand);
+            color: var(--espresso);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .btn-back:active {
+            transform: scale(0.95);
+        }
+
+        .score-badge {
+            background-color: var(--card-bg);
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-weight: 700;
+            border: 1px solid var(--sand);
+        }
+
+        /* Menu Utama */
+        .menu-card {
+            background-color: var(--card-bg);
+            padding: 28px 22px;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(58, 50, 44, 0.06);
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: var(--muted-text);
+            margin-bottom: 24px;
+            line-height: 1.4;
+        }
+
+        .game-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .game-btn {
+            background-color: var(--sage);
+            color: white;
+            border: none;
+            padding: 18px 20px;
+            border-radius: 18px;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: transform 0.15s, background-color 0.2s;
+            box-shadow: 0 4px 12px rgba(138, 154, 134, 0.25);
+        }
+
+        .game-btn:nth-child(2) {
+            background-color: var(--terracotta);
+            box-shadow: 0 4px 12px rgba(200, 125, 85, 0.25);
+        }
+
+        .game-btn:nth-child(3) {
+            background-color: #7F8C72;
+        }
+
+        .game-btn:active {
+            transform: scale(0.97);
+        }
+
+        .game-icon {
+            font-size: 2rem;
+            background: rgba(255, 255, 255, 0.2);
+            width: 52px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+        }
+
+        .game-info h3 {
+            font-size: 1.05rem;
+            margin-bottom: 4px;
+        }
+
+        .game-info p {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        /* ================= GAME 1: BUBBLE WRAP ================= */
+        #bubble-screen {
+            justify-content: flex-start;
+        }
+
+        .bubble-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            width: 100%;
+            background-color: var(--card-bg);
+            padding: 16px;
+            border-radius: 20px;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.04);
+            margin-bottom: 16px;
+        }
+
+        .bubble {
+            aspect-ratio: 1;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #A9B8A5, var(--sage));
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 3px 6px rgba(58, 50, 44, 0.15), inset 0 -2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.08s;
+        }
+
+        .bubble:active {
+            transform: scale(0.88);
+        }
+
+        .bubble.popped {
+            background: var(--sage-light);
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.08);
+            transform: scale(0.92);
+        }
+
+        .action-btn {
+            background-color: var(--terracotta);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+
+        /* ================= GAME 2: HIT THE BEAR ================= */
+        .arcade-machine {
+            background-color: var(--sand);
+            padding: 20px;
+            border-radius: 24px;
+            width: 100%;
+            border: 4px solid var(--terracotta);
+            box-shadow: 0 10px 25px rgba(58, 50, 44, 0.1);
+        }
+
+        .arcade-header {
+            background-color: var(--terracotta);
+            color: white;
+            text-align: center;
+            padding: 10px;
+            border-radius: 12px;
+            font-weight: 700;
+            margin-bottom: 18px;
+            letter-spacing: 0.5px;
+        }
+
+        .holes-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+        }
+
+        .hole {
+            aspect-ratio: 1;
+            background-color: #4A3B32;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 8px 12px rgba(0,0,0,0.4);
+            cursor: pointer;
+        }
+
+        .bear {
+            position: absolute;
+            bottom: -100%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 3.2rem;
+            transition: bottom 0.15s ease-out;
+            pointer-events: none;
+        }
+
+        .hole.up .bear {
+            bottom: 8%;
+        }
+
+        .hole.bonked .bear {
+            transform: translateX(-50%) scale(0.8) rotate(15deg);
+            filter: brightness(1.3);
+        }
+
+        .speed-indicator {
+            margin-top: 14px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--muted-text);
+            font-weight: 600;
+        }
+
+        /* ================= GAME 3: CUT THE BANANA ================= */
+        #banana-screen {
+            padding: 16px;
+        }
+
+        #banana-canvas {
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            width: 100%;
+            height: 68vh;
+            touch-action: none;
+            box-shadow: 0 8px 20px rgba(58, 50, 44, 0.06);
+            border: 2px solid var(--sand);
+            cursor: crosshair;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ================= MENU UTAMA ================= -->
+    <div id="menu-screen" class="screen active">
+        <div class="menu-card">
+            <h1>Mood Relief Arcade 🌿</h1>
+            <p class="subtitle">Pilih mini-game santai buat lepasin penat atau rasa keselmu sejenak.</p>
+            
+            <div class="game-list">
+                <button class="game-btn" onclick="openGame('bubble')">
+                    <div class="game-icon">🫧</div>
+                    <div class="game-info">
+                        <h3>Virtual Bubble Wrap</h3>
+                        <p>Pencet gelembungnya sampai puas dengan suara pop!</p>
+                    </div>
+                </button>
+
+                <button class="game-btn" onclick="openGame('bear')">
+                    <div class="game-icon">🧸</div>
+                    <div class="game-info">
+                        <h3>Hit the Bear</h3>
+                        <p>Ketuk beruang yang muncul, makin lama makin cepat.</p>
+                    </div>
+                </button>
+
+                <button class="game-btn" onclick="openGame('banana')">
+                    <div class="game-icon">🍌</div>
+                    <div class="game-info">
+                        <h3>Cut the Banana</h3>
+                        <p>Geser atau ketuk pisang yang melayang di layar.</p>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= GAME 1: BUBBLE WRAP ================= -->
+    <div id="bubble-screen" class="screen">
+        <div class="top-bar">
+            <button class="btn-back" onclick="goHome()">← Menu</button>
+            <div class="score-badge">Pecah: <span id="bubble-count">0</span></div>
+        </div>
+        <div class="bubble-grid" id="bubble-grid"></div>
+        <button class="action-btn" onclick="initBubbles()">Ganti Lembaran Baru</button>
+    </div>
+
+    <!-- ================= GAME 2: HIT THE BEAR ================= -->
+    <div id="bear-screen" class="screen">
+        <div class="top-bar">
+            <button class="btn-back" onclick="goHome()">← Menu</button>
+            <div class="score-badge">Skor: <span id="bear-score">0</span></div>
+        </div>
+        <div class="arcade-machine">
+            <div class="arcade-header">BEAR SMASH ZONE</div>
+            <div class="holes-grid" id="holes-grid">
+                <div class="hole" data-index="0"><div class="bear">🐻</div></div>
+                <div class="hole" data-index="1"><div class="bear">🐻</div></div>
+                <div class="hole" data-index="2"><div class="bear">🐻</div></div>
+                <div class="hole" data-index="3"><div class="bear">🐻</div></div>
+                <div class="hole" data-index="4"><div class="bear">🐻</div></div>
+                <div class="hole" data-index="5"><div class="bear">🐻</div></div>
+            </div>
+            <div class="speed-indicator" id="bear-speed-text">Kecepatan: Normal (Level 1)</div>
+        </div>
+    </div>
+
+    <!-- ================= GAME 3: CUT THE BANANA ================= -->
+    <div id="banana-screen" class="screen">
+        <div class="top-bar">
+            <button class="btn-back" onclick="goHome()">← Menu</button>
+            <div class="score-badge">Terpotong: <span id="banana-score">0</span></div>
+        </div>
+        <canvas id="banana-canvas"></canvas>
+    </div>
+
+    <script>
+        /* ================= WEB AUDIO API (EFEK SUARA TANPA FILE EKSTERNAL) ================= */
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
+
+        function ensureAudio() {
+            if (!audioCtx) audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        // Suara Bubble Wrap Pop
+        function playPopSound() {
+            ensureAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            // Frekuensi naik cepat lalu turun untuk efek "plop/pop" plastik
+            const now = audioCtx.currentTime;
+            osc.frequency.setValueAtTime(320 + Math.random() * 120, now);
+            osc.frequency.exponentialRampToValueAtTime(900, now + 0.03);
+            osc.frequency.exponentialRampToValueAtTime(120, now + 0.08);
+
+            gain.gain.setValueAtTime(0.5, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now);
+            osc.stop(now + 0.08);
+        }
+
+        // Suara Pukul Beruang (Bonk)
+        function playBonkSound() {
+            ensureAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            const now = audioCtx.currentTime;
+            osc.frequency.setValueAtTime(220, now);
+            osc.frequency.exponentialRampToValueAtTime(65, now + 0.15);
+
+            gain.gain.setValueAtTime(0.6, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now);
+            osc.stop(now + 0.15);
+        }
+
+        // Suara Tebasan Pisang (Slice)
+        function playSliceSound() {
+            ensureAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            const now = audioCtx.currentTime;
+            osc.frequency.setValueAtTime(800, now);
+            osc.frequency.exponentialRampToValueAtTime(200, now + 0.12);
+
+            gain.gain.setValueAtTime(0.25, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now);
+            osc.stop(now + 0.12);
+        }
+
+        /* ================= NAVIGASI HALAMAN ================= */
+        function openGame(gameName) {
+            ensureAudio();
+            stopBearGame();
+            stopBananaGame();
+
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(`${gameName}-screen`).classList.add('active');
+
+            if (gameName === 'bubble') initBubbles();
+            if (gameName === 'bear') startBearGame();
+            if (gameName === 'banana') startBananaGame();
+        }
+
+        function goHome() {
+            stopBearGame();
+            stopBananaGame();
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('menu-screen').classList.add('active');
+        }
+
+        /* ================= LOGIKA GAME 1: BUBBLE WRAP ================= */
+        let poppedTotal = 0;
+        function initBubbles() {
+            const grid = document.getElementById('bubble-grid');
+            grid.innerHTML = '';
+            // Buat 48 gelembung memenuhi layar
+            for (let i = 0; i < 48; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'bubble';
+                btn.addEventListener('pointerdown', () => {
+                    if (!btn.classList.contains('popped')) {
+                        btn.classList.add('popped');
+                        playPopSound();
+                        poppedTotal++;
+                        document.getElementById('bubble-count').innerText = poppedTotal;
+                    }
+                });
+                grid.appendChild(btn);
+            }
+        }
+
+        /* ================= LOGIKA GAME 2: HIT THE BEAR ================= */
+        let bearScore = 0;
+        let bearTimer = null;
+        let isBearRunning = false;
+        let lastHole = -1;
+
+        const holes = document.querySelectorAll('.hole');
+        holes.forEach(hole => {
+            hole.addEventListener('pointerdown', () => {
+                if (hole.classList.contains('up') && !hole.classList.contains('bonked')) {
+                    hole.classList.add('bonked');
+                    hole.classList.remove('up');
+                    playBonkSound();
+                    bearScore++;
+                    document.getElementById('bear-score').innerText = bearScore;
+                    updateSpeedLabel();
+                }
+            });
+        });
+
+        function updateSpeedLabel() {
+            const level = Math.floor(bearScore / 5) + 1;
+            document.getElementById('bear-speed-text').innerText = `Kecepatan: Level ${level}`;
+        }
+
+        function startBearGame() {
+            bearScore = 0;
+            document.getElementById('bear-score').innerText = 0;
+            updateSpeedLabel();
+            isBearRunning = true;
+            peepBear();
+        }
+
+        function stopBearGame() {
+            isBearRunning = false;
+            clearTimeout(bearTimer);
+            holes.forEach(h => h.classList.remove('up', 'bonked'));
+        }
+
+        function peepBear() {
+            if (!isBearRunning) return;
+
+            // Semakin tinggi skor, durasi muncul beruang semakin cepat (minimal 320ms)
+            const speedReduction = Math.min(bearScore * 22, 750);
+            const showTime = Math.max(1100 - speedReduction, 320);
+
+            let idx;
+            do {
+                idx = Math.floor(Math.random() * holes.length);
+            } while (idx === lastHole);
+            lastHole = idx;
+
+            const hole = holes[idx];
+            hole.classList.remove('bonked');
+            hole.classList.add('up');
+
+            bearTimer = setTimeout(() => {
+                hole.classList.remove('up');
+                if (isBearRunning) peepBear();
+            }, showTime);
+        }
+
+        /* ================= LOGIKA GAME 3: CUT THE BANANA ================= */
+        const canvas = document.getElementById('banana-canvas');
+        const ctx = canvas.getContext('2d');
+        let bananaAnimId = null;
+        let bananaSpawnTimer = null;
+        let bananas = [];
+        let slicedHalves = [];
+        let bladeTrail = [];
+        let bananaScore = 0;
+        let isSlicing = false;
+
+        function resizeCanvas() {
+            canvas.width = canvas.clientWidth;
+            canvas.height = canvas.clientHeight;
+        }
+
+        function startBananaGame() {
+            resizeCanvas();
+            bananaScore = 0;
+            bananas = [];
+            slicedHalves = [];
+            bladeTrail = [];
+            document.getElementById('banana-score').innerText = 0;
+
+            spawnBananaWave();
+            bananaSpawnTimer = setInterval(spawnBananaWave, 1500);
+            updateBananaCanvas();
+        }
+
+        function stopBananaGame() {
+            cancelAnimationFrame(bananaAnimId);
+            clearInterval(bananaSpawnTimer);
+        }
+
+        function spawnBananaWave() {
+            const count = Math.floor(Math.random() * 2) + 1; // 1 sampai 2 pisang sekali lempar
+            for (let i = 0; i < count; i++) {
+                bananas.push({
+                    x: Math.random() * (canvas.width - 80) + 40,
+                    y: canvas.height + 30,
+                    vx: (Math.random() - 0.5) * 3.5,
+                    vy: -(Math.random() * 4 + 10.5),
+                    rotation: Math.random() * Math.PI * 2,
+                    vRot: (Math.random() - 0.5) * 0.1,
+                    radius: 34
+                });
+            }
+        }
+
+        function checkSlice(x, y) {
+            for (let i = bananas.length - 1; i >= 0; i--) {
+                const b = bananas[i];
+                const dist = Math.hypot(x - b.x, y - b.y);
+                if (dist < b.radius + 14) {
+                    playSliceSound();
+                    bananaScore++;
+                    document.getElementById('banana-score').innerText = bananaScore;
+
+                    // Buat efek belahan pisang jatuh ke kiri & kanan
+                    slicedHalves.push(
+                        { x: b.x - 10, y: b.y, vx: b.vx - 2.5,
