@@ -786,3 +786,29 @@
                 ctx.restore();
 
                 if (h.alpha <= 0) slicedHalves.splice(i, 1);
+            }
+
+            // Gambar jejak tebasan pedang warna terracotta
+            if (bladeTrail.length > 1) {
+                ctx.beginPath();
+                ctx.moveTo(bladeTrail[0].x, bladeTrail[0].y);
+                for (let i = 1; i < bladeTrail.length; i++) {
+                    ctx.lineTo(bladeTrail[i].x, bladeTrail[i].y);
+                }
+                ctx.strokeStyle = '#C87D55';
+                ctx.lineWidth = 5;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.stroke();
+            }
+
+            for (let i = bladeTrail.length - 1; i >= 0; i--) {
+                bladeTrail[i].life--;
+                if (bladeTrail[i].life <= 0) bladeTrail.splice(i, 1);
+            }
+
+            bananaAnimId = requestAnimationFrame(updateBananaCanvas);
+        }
+    </script>
+</body>
+</html>
