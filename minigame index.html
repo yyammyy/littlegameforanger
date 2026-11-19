@@ -38,7 +38,6 @@
             overflow-x: hidden;
         }
 
-        /* Halaman / Views */
         .screen {
             display: none;
             width: 100%;
@@ -54,7 +53,6 @@
             display: flex;
         }
 
-        /* Header & Navigasi */
         .top-bar {
             width: 100%;
             display: flex;
@@ -86,7 +84,6 @@
             border: 1px solid var(--sand);
         }
 
-        /* Menu Utama */
         .menu-card {
             background-color: var(--card-bg);
             padding: 28px 22px;
@@ -163,7 +160,7 @@
             opacity: 0.9;
         }
 
-        /* ================= GAME 1: BUBBLE WRAP ================= */
+        /* GAME 1: BUBBLE WRAP */
         #bubble-screen {
             justify-content: flex-start;
         }
@@ -211,7 +208,7 @@
             cursor: pointer;
         }
 
-        /* ================= GAME 2: HIT THE BEAR ================= */
+        /* GAME 2: HIT THE BEAR */
         .arcade-machine {
             background-color: var(--sand);
             padding: 20px;
@@ -275,7 +272,7 @@
             font-weight: 600;
         }
 
-        /* ================= GAME 3: CUT THE BANANA ================= */
+        /* GAME 3: CUT THE BANANA */
         #banana-screen {
             padding: 16px;
         }
@@ -294,7 +291,7 @@
 </head>
 <body>
 
-    <!-- ================= MENU UTAMA ================= -->
+    <!-- MENU UTAMA -->
     <div id="menu-screen" class="screen active">
         <div class="menu-card">
             <h1>Mood Relief Arcade 🌿</h1>
@@ -328,7 +325,7 @@
         </div>
     </div>
 
-    <!-- ================= GAME 1: BUBBLE WRAP ================= -->
+    <!-- GAME 1: BUBBLE WRAP -->
     <div id="bubble-screen" class="screen">
         <div class="top-bar">
             <button class="btn-back" onclick="goHome()">← Menu</button>
@@ -338,7 +335,7 @@
         <button class="action-btn" onclick="initBubbles()">Ganti Lembaran Baru</button>
     </div>
 
-    <!-- ================= GAME 2: HIT THE BEAR ================= -->
+    <!-- GAME 2: HIT THE BEAR -->
     <div id="bear-screen" class="screen">
         <div class="top-bar">
             <button class="btn-back" onclick="goHome()">← Menu</button>
@@ -358,7 +355,7 @@
         </div>
     </div>
 
-    <!-- ================= GAME 3: CUT THE BANANA ================= -->
+    <!-- GAME 3: CUT THE BANANA -->
     <div id="banana-screen" class="screen">
         <div class="top-bar">
             <button class="btn-back" onclick="goHome()">← Menu</button>
@@ -368,7 +365,6 @@
     </div>
 
     <script>
-        /* ================= WEB AUDIO API (EFEK SUARA TANPA FILE EKSTERNAL) ================= */
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx;
 
@@ -377,13 +373,11 @@
             if (audioCtx.state === 'suspended') audioCtx.resume();
         }
 
-        // Suara Bubble Wrap Pop
         function playPopSound() {
             ensureAudio();
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.type = 'sine';
-            // Frekuensi naik cepat lalu turun untuk efek "plop/pop" plastik
             const now = audioCtx.currentTime;
             osc.frequency.setValueAtTime(320 + Math.random() * 120, now);
             osc.frequency.exponentialRampToValueAtTime(900, now + 0.03);
@@ -398,7 +392,6 @@
             osc.stop(now + 0.08);
         }
 
-        // Suara Pukul Beruang (Bonk)
         function playBonkSound() {
             ensureAudio();
             const osc = audioCtx.createOscillator();
@@ -417,7 +410,6 @@
             osc.stop(now + 0.15);
         }
 
-        // Suara Tebasan Pisang (Slice)
         function playSliceSound() {
             ensureAudio();
             const osc = audioCtx.createOscillator();
@@ -436,7 +428,6 @@
             osc.stop(now + 0.12);
         }
 
-        /* ================= NAVIGASI HALAMAN ================= */
         function openGame(gameName) {
             ensureAudio();
             stopBearGame();
@@ -457,12 +448,10 @@
             document.getElementById('menu-screen').classList.add('active');
         }
 
-        /* ================= LOGIKA GAME 1: BUBBLE WRAP ================= */
         let poppedTotal = 0;
         function initBubbles() {
             const grid = document.getElementById('bubble-grid');
             grid.innerHTML = '';
-            // Buat 48 gelembung memenuhi layar
             for (let i = 0; i < 48; i++) {
                 const btn = document.createElement('button');
                 btn.className = 'bubble';
@@ -478,7 +467,6 @@
             }
         }
 
-        /* ================= LOGIKA GAME 2: HIT THE BEAR ================= */
         let bearScore = 0;
         let bearTimer = null;
         let isBearRunning = false;
@@ -520,7 +508,6 @@
         function peepBear() {
             if (!isBearRunning) return;
 
-            // Semakin tinggi skor, durasi muncul beruang semakin cepat (minimal 320ms)
             const speedReduction = Math.min(bearScore * 22, 750);
             const showTime = Math.max(1100 - speedReduction, 320);
 
@@ -540,7 +527,6 @@
             }, showTime);
         }
 
-        /* ================= LOGIKA GAME 3: CUT THE BANANA ================= */
         const canvas = document.getElementById('banana-canvas');
         const ctx = canvas.getContext('2d');
         let bananaAnimId = null;
@@ -575,7 +561,7 @@
         }
 
         function spawnBananaWave() {
-            const count = Math.floor(Math.random() * 2) + 1; // 1 sampai 2 pisang sekali lempar
+            const count = Math.floor(Math.random() * 2) + 1;
             for (let i = 0; i < count; i++) {
                 bananas.push({
                     x: Math.random() * (canvas.width - 80) + 40,
@@ -598,6 +584,103 @@
                     bananaScore++;
                     document.getElementById('banana-score').innerText = bananaScore;
 
-                    // Buat efek belahan pisang jatuh ke kiri & kanan
                     slicedHalves.push(
-                        { x: b.x - 10, y: b.y, vx: b.vx - 2.5,
+                        { x: b.x - 10, y: b.y, vx: b.vx - 2.5, vy: b.vy * 0.6, rot: b.rotation, alpha: 1 },
+                        { x: b.x + 10, y: b.y, vx: b.vx + 2.5, vy: b.vy * 0.6, rot: b.rotation + 0.5, alpha: 1 }
+                    );
+                    bananas.splice(i, 1);
+                }
+            }
+        }
+
+        function getPointerPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return { x: clientX - rect.left, y: clientY - rect.top };
+        }
+
+        canvas.addEventListener('pointerdown', (e) => {
+            isSlicing = true;
+            const pos = getPointerPos(e);
+            bladeTrail.push({ x: pos.x, y: pos.y, life: 10 });
+            checkSlice(pos.x, pos.y);
+        });
+
+        canvas.addEventListener('pointermove', (e) => {
+            if (!isSlicing) return;
+            const pos = getPointerPos(e);
+            bladeTrail.push({ x: pos.x, y: pos.y, life: 10 });
+            checkSlice(pos.x, pos.y);
+        });
+
+        window.addEventListener('pointerup', () => {
+            isSlicing = false;
+        });
+
+        function updateBananaCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = bananas.length - 1; i >= 0; i--) {
+                const b = bananas[i];
+                b.x += b.vx;
+                b.y += b.vy;
+                b.vy += 0.25;
+                b.rotation += b.vRot;
+
+                ctx.save();
+                ctx.translate(b.x, b.y);
+                ctx.rotate(b.rotation);
+                ctx.font = '52px serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('🍌', 0, 0);
+                ctx.restore();
+
+                if (b.y > canvas.height + 60) {
+                    bananas.splice(i, 1);
+                }
+            }
+
+            for (let i = slicedHalves.length - 1; i >= 0; i--) {
+                const h = slicedHalves[i];
+                h.x += h.vx;
+                h.y += h.vy;
+                h.vy += 0.3;
+                h.alpha -= 0.03;
+
+                ctx.save();
+                ctx.globalAlpha = Math.max(h.alpha, 0);
+                ctx.translate(h.x, h.y);
+                ctx.rotate(h.rot);
+                ctx.font = '32px serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('🍌', 0, 0);
+                ctx.restore();
+
+                if (h.alpha <= 0) slicedHalves.splice(i, 1);
+            }
+
+            if (bladeTrail.length > 1) {
+                ctx.beginPath();
+                ctx.moveTo(bladeTrail[0].x, bladeTrail[0].y);
+                for (let i = 1; i < bladeTrail.length; i++) {
+                    ctx.lineTo(bladeTrail[i].x, bladeTrail[i].y);
+                }
+                ctx.strokeStyle = '#C87D55';
+                ctx.lineWidth = 5;
+                ctx.lineCap = 'round';
+                ctx.stroke();
+            }
+
+            for (let i = bladeTrail.length - 1; i >= 0; i--) {
+                bladeTrail[i].life--;
+                if (bladeTrail[i].life <= 0) bladeTrail.splice(i, 1);
+            }
+
+            bananaAnimId = requestAnimationFrame(updateBananaCanvas);
+        }
+    </script>
+</body>
+</html>
